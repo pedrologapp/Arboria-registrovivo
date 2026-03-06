@@ -512,18 +512,15 @@ function DemandasBoard() {
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const r = await window.storage.get(DEMANDAS_KEY);
-        if (r && r.value) setDemands(JSON.parse(r.value));
-      } catch(e) {}
-    }
-    load();
+    try {
+      const r = localStorage.getItem(DEMANDAS_KEY);
+      if (r) setDemands(JSON.parse(r));
+    } catch(e) {}
   }, []);
 
   useEffect(() => {
     if (demands.length > 0) {
-      window.storage.set(DEMANDAS_KEY, JSON.stringify(demands)).catch(() => {});
+      try { localStorage.setItem(DEMANDAS_KEY, JSON.stringify(demands)); } catch(e) {}
     }
   }, [demands]);
 
@@ -1030,32 +1027,29 @@ export default function ArboriaRegistry() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const result = await window.storage.get(STORAGE_KEY);
-        if (result && result.value) {
-          const parsed = JSON.parse(result.value);
-          if (parsed && parsed.length > 0) {
-            setCategories(parsed);
-            setLoading(false);
-            return;
-          }
+    try {
+      const result = localStorage.getItem(STORAGE_KEY);
+      if (result) {
+        const parsed = JSON.parse(result);
+        if (parsed && parsed.length > 0) {
+          setCategories(parsed);
+          setLoading(false);
+          return;
         }
-      } catch (e) { /* first load */ }
-      const init = initialCategories.map((cat) => {
-        if (cat.id === "E") return { ...cat, docs: generateAulaDocs() };
-        if (cat.id === "F") return { ...cat, docs: generateMissaoDocs() };
-        return cat;
-      });
-      setCategories(init);
-      setLoading(false);
-    }
-    load();
+      }
+    } catch (e) { /* first load */ }
+    const init = initialCategories.map((cat) => {
+      if (cat.id === "E") return { ...cat, docs: generateAulaDocs() };
+      if (cat.id === "F") return { ...cat, docs: generateMissaoDocs() };
+      return cat;
+    });
+    setCategories(init);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     if (categories && !loading) {
-      window.storage.set(STORAGE_KEY, JSON.stringify(categories)).catch(() => {});
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(categories)); } catch(e) {}
     }
   }, [categories, loading]);
 
@@ -1272,11 +1266,6 @@ export default function ArboriaRegistry() {
     </div>
   );
 }
-
-
-
-
-
 
 
 
